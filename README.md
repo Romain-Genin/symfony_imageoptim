@@ -25,8 +25,6 @@ puis les **sert dans le format et la taille adaptés à chaque appareil** (AVIF/
 composer require romain-genin/symfony-image-optimizer-bundle
 ```
 
-> **Avec le starter** [`romain-genin/symfony-starter`](https://packagist.org/packages/romain-genin/symfony-starter) : `composer require`
-> suffit, les routes et la configuration sont déjà fournies. Le bundle reste utilisable seul dans n'importe quel projet Symfony.
 
 Avec Symfony Flex le bundle est enregistré automatiquement. Sinon, dans `config/bundles.php` :
 
