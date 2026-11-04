@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.1'
+            symfony: '6.4.*'
+          - php: '8.2'
+            symfony: '7.*'
+          - php: '8.3'
+            symfony: '7.*'
+          - php: '8.4'
+            symfony: '8.*'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install optional image tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libjpeg-turbo-progs optipng gifsicle webp
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: gd, zlib, exif
+          tools: composer, flex
+      - name: Install dependencies
+        env:
+          SYMFONY_REQUIRE: ${{ matrix.symfony }}
+        run: composer update --no-interaction --prefer-dist
+      - run: vendor/bin/phpunit
