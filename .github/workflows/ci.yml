@@ -19,17 +19,24 @@ jobs:
             symfony: '7.*'
           - php: '8.4'
             symfony: '8.*'
+          - php: '8.5'
+            symfony: '8.*'
+          - php: '8.1'
+            symfony: '6.4.*'
+            dependencies: lowest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install optional image tools
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libjpeg-turbo-progs optipng gifsicle webp
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libjpeg-turbo-progs optipng gifsicle webp libavif-bin
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           extensions: gd, zlib, exif
           tools: composer, flex
+      - name: Validate composer.json
+        run: composer validate --strict
       - name: Install dependencies
         env:
           SYMFONY_REQUIRE: ${{ matrix.symfony }}
-        run: composer update --no-interaction --prefer-dist
+        run: composer update --no-interaction --prefer-dist ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
       - run: vendor/bin/phpunit

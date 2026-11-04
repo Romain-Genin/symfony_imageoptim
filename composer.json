@@ -2,8 +2,33 @@
     "name": "studioastra/image-optimizer-bundle",
     "description": "Symfony bundle that losslessly optimizes every uploaded image (weight, format, metadata) and serves device-adapted responsive variants (AVIF/WebP, srcset, Client Hints).",
     "type": "symfony-bundle",
+    "keywords": [
+        "symfony",
+        "bundle",
+        "image",
+        "optimization",
+        "upload",
+        "webp",
+        "avif",
+        "lossless",
+        "responsive",
+        "srcset",
+        "accessibility",
+        "a11y",
+        "alt-text"
+    ],
+    "homepage": "https://github.com/StudioAstra/ImageOptimizer",
     "license": "MIT",
-    "keywords": ["symfony", "bundle", "image", "optimization", "upload", "webp", "avif", "lossless", "responsive", "srcset"],
+    "authors": [
+        {
+            "name": "Studio Astra",
+            "homepage": "https://github.com/StudioAstra"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/StudioAstra/ImageOptimizer/issues",
+        "source": "https://github.com/StudioAstra/ImageOptimizer"
+    },
     "require": {
         "php": ">=8.1",
         "ext-zlib": "*",

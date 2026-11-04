@@ -1,0 +1,6 @@
+# Keep the Composer package (dist archive) small: only what is needed at runtime.
+/.github            export-ignore
+/tests              export-ignore
+/.gitattributes     export-ignore
+/.gitignore         export-ignore
+/phpunit.xml.dist   export-ignore
