@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace StudioAstra\ImageOptimizerBundle\Tests\Functional;
 
+use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
 use StudioAstra\ImageOptimizerBundle\FormatDetector;
 use StudioAstra\ImageOptimizerBundle\ImageFormat;
 use StudioAstra\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
@@ -89,7 +90,10 @@ final class BundleTest extends WebTestCase
         $client->request('GET', '/page', ['tpl' => "{{ responsive_image('uploads/photo.jpg', {alt: 'Une photo', sizes: '(min-width: 800px) 50vw, 100vw', class: 'hero'}) }}"]);
         $html = (string) $client->getResponse()->getContent();
 
-        self::assertStringStartsWith('<picture><source type="image/webp" srcset="/_image/320/uploads/photo.jpg.webp 320w, ', $html);
+        // AVIF is offered first when this server can encode it (GD with libavif, or avifenc).
+        $avif = self::avifAvailable();
+        self::assertStringStartsWith($avif ? '<picture><source type="image/avif" srcset="/_image/320/uploads/photo.jpg.avif 320w, ' : '<picture><source type="image/webp"', $html);
+        self::assertStringContainsString('<source type="image/webp" srcset="/_image/320/uploads/photo.jpg.webp 320w, ', $html);
         self::assertStringContainsString('/_image/1280/uploads/photo.jpg.webp 1000w"', $html, 'No upscaling: largest candidate is the source width');
         self::assertStringContainsString('sizes="(min-width: 800px) 50vw, 100vw"', $html);
         self::assertStringContainsString('<img src="/_image/1280/uploads/photo.jpg.jpg"', $html);
@@ -115,7 +119,7 @@ final class BundleTest extends WebTestCase
         copy(ImageFactory::jpeg(ImageFactory::photo(1600, 900)), self::$workDir . '/public/uploads/wide.jpg');
 
         $client->request('GET', '/_image/auto/uploads/wide.jpg', [], [], [
-            'HTTP_ACCEPT' => 'image/avif,image/webp,*/*',
+            'HTTP_ACCEPT' => 'image/webp,*/*',
             'HTTP_SEC_CH_VIEWPORT_WIDTH' => '390',
             'HTTP_SEC_CH_DPR' => '3',
         ]);
@@ -129,6 +133,26 @@ final class BundleTest extends WebTestCase
         $client->request('GET', '/_image/auto/uploads/logo.png', [], [], ['HTTP_ACCEPT' => 'image/png']);
         self::assertResponseIsSuccessful();
         self::assertSame('image/png', $client->getResponse()->headers->get('Content-Type'));
+    }
+
+    public function testAvifIsPreferredWhenSupported(): void
+    {
+        if (!self::avifAvailable()) {
+            self::markTestSkipped('No AVIF encoder (GD with libavif or avifenc) on this machine');
+        }
+
+        $client = $this->client();
+        copy(ImageFactory::jpeg(ImageFactory::photo(800, 450)), self::$workDir . '/public/uploads/avif.jpg');
+
+        $client->request('GET', '/_image/auto/uploads/avif.jpg', [], [], ['HTTP_ACCEPT' => 'image/avif,image/webp,*/*']);
+        self::assertResponseIsSuccessful();
+        self::assertSame('image/avif', $client->getResponse()->headers->get('Content-Type'));
+        self::assertSame(ImageFormat::Avif, (new FormatDetector())->detect($client->getResponse()->getFile()->getPathname()));
+    }
+
+    private static function avifAvailable(): bool
+    {
+        return (\function_exists('imageavif') && (gd_info()['AVIF Support'] ?? false)) || (new BinaryRunner())->has('avifenc');
     }
 
     public function testVariantSecurity(): void

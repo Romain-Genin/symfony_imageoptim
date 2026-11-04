@@ -1,5 +1,10 @@
 # ImageOptimizerBundle
 
+[![CI](https://github.com/StudioAstra/ImageOptimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/StudioAstra/ImageOptimizer/actions/workflows/ci.yml)
+[![Packagist Version](https://img.shields.io/packagist/v/studioastra/image-optimizer-bundle)](https://packagist.org/packages/studioastra/image-optimizer-bundle)
+[![PHP](https://img.shields.io/packagist/dependency-v/studioastra/image-optimizer-bundle/php)](https://packagist.org/packages/studioastra/image-optimizer-bundle)
+[![License](https://img.shields.io/packagist/l/studioastra/image-optimizer-bundle)](LICENSE)
+
 Bundle Symfony qui **optimise automatiquement toutes les images uploadées, sans perte de qualité**,
 puis les **sert dans le format et la taille adaptés à chaque appareil** (AVIF/WebP, `srcset`, Client Hints).
 
@@ -299,6 +304,11 @@ Les logs sont émis sur le canal Monolog `image_optimizer`.
 - HEIC/HEIF et AVIF uploadés sont laissés tels quels (déjà très compressés ; toute conversion serait avec perte ou plus lourde).
 - SVG : le bundle optimise mais ne **nettoie pas** les scripts éventuellement présents (XSS) ; utilisez un sanitizer dédié si
   vous acceptez des SVG d'utilisateurs non fiables.
+
+## Compatibilité
+
+PHP 8.1 à 8.5, Symfony 6.4, 7.x et 8.x. Extension GD recommandée.
+Les changements de chaque version sont listés dans [CHANGELOG.md](CHANGELOG.md).
 
 ## Tests
 
