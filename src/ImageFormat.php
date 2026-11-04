@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle;
+namespace RomainGenin\ImageOptimizerBundle;
 
 /**
  * Image formats known by the bundle.

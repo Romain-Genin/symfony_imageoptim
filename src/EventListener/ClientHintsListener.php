@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\EventListener;
+namespace RomainGenin\ImageOptimizerBundle\EventListener;
 
-use StudioAstra\ImageOptimizerBundle\Controller\ImageVariantController;
+use RomainGenin\ImageOptimizerBundle\Controller\ImageVariantController;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 /**

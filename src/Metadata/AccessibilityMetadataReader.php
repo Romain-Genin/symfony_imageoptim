@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Metadata;
+namespace RomainGenin\ImageOptimizerBundle\Metadata;
 
-use StudioAstra\ImageOptimizerBundle\FormatDetector;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\FormatDetector;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
 
 /**
  * Reads the text alternatives embedded in an image (IPTC accessibility fields in XMP,

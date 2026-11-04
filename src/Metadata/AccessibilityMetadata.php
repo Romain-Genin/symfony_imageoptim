@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Metadata;
+namespace RomainGenin\ImageOptimizerBundle\Metadata;
 
 /**
  * IPTC Photo Metadata accessibility fields (2021.1+), stored in XMP:

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\EventListener;
+namespace RomainGenin\ImageOptimizerBundle\EventListener;
 
-use StudioAstra\ImageOptimizerBundle\Upload\UploadedFileOptimizer;
+use RomainGenin\ImageOptimizerBundle\Upload\UploadedFileOptimizer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 

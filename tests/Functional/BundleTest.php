@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Tests\Functional;
+namespace RomainGenin\ImageOptimizerBundle\Tests\Functional;
 
-use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
-use StudioAstra\ImageOptimizerBundle\FormatDetector;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
-use StudioAstra\ImageOptimizerBundle\Tests\ImageFactory;
+use RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner;
+use RomainGenin\ImageOptimizerBundle\FormatDetector;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
+use RomainGenin\ImageOptimizerBundle\Tests\ImageFactory;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Controller;
+namespace RomainGenin\ImageOptimizerBundle\Controller;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Responsive\ResponsiveImageRenderer;
-use StudioAstra\ImageOptimizerBundle\Responsive\VariantGenerator;
-use StudioAstra\ImageOptimizerBundle\Responsive\VariantStorage;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Responsive\ResponsiveImageRenderer;
+use RomainGenin\ImageOptimizerBundle\Responsive\VariantGenerator;
+use RomainGenin\ImageOptimizerBundle\Responsive\VariantStorage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

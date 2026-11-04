@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Tests\Functional;
+namespace RomainGenin\ImageOptimizerBundle\Tests\Functional;
 
-use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
-use StudioAstra\ImageOptimizerBundle\Exception\MissingAltTextException;
-use StudioAstra\ImageOptimizerBundle\Responsive\ResponsiveImageRenderer;
-use StudioAstra\ImageOptimizerBundle\Tests\ImageFactory;
+use RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner;
+use RomainGenin\ImageOptimizerBundle\Exception\MissingAltTextException;
+use RomainGenin\ImageOptimizerBundle\Responsive\ResponsiveImageRenderer;
+use RomainGenin\ImageOptimizerBundle\Tests\ImageFactory;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;

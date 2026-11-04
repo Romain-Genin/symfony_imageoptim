@@ -1,9 +1,9 @@
 # ImageOptimizerBundle
 
 [![CI](https://github.com/StudioAstra/ImageOptimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/StudioAstra/ImageOptimizer/actions/workflows/ci.yml)
-[![Packagist Version](https://img.shields.io/packagist/v/studioastra/image-optimizer-bundle)](https://packagist.org/packages/studioastra/image-optimizer-bundle)
-[![PHP](https://img.shields.io/packagist/dependency-v/studioastra/image-optimizer-bundle/php)](https://packagist.org/packages/studioastra/image-optimizer-bundle)
-[![License](https://img.shields.io/packagist/l/studioastra/image-optimizer-bundle)](LICENSE)
+[![Packagist Version](https://img.shields.io/packagist/v/romain-genin/symfony-image-optimizer-bundle)](https://packagist.org/packages/romain-genin/symfony-image-optimizer-bundle)
+[![PHP](https://img.shields.io/packagist/dependency-v/romain-genin/symfony-image-optimizer-bundle/php)](https://packagist.org/packages/romain-genin/symfony-image-optimizer-bundle)
+[![License](https://img.shields.io/packagist/l/romain-genin/symfony-image-optimizer-bundle)](LICENSE)
 
 Bundle Symfony qui **optimise automatiquement toutes les images uploadées, sans perte de qualité**,
 puis les **sert dans le format et la taille adaptés à chaque appareil** (AVIF/WebP, `srcset`, Client Hints).
@@ -22,13 +22,13 @@ puis les **sert dans le format et la taille adaptés à chaque appareil** (AVIF/
 ## Installation
 
 ```bash
-composer require studioastra/image-optimizer-bundle
+composer require romain-genin/symfony-image-optimizer-bundle
 ```
 
 Avec Symfony Flex le bundle est enregistré automatiquement. Sinon, dans `config/bundles.php` :
 
 ```php
-StudioAstra\ImageOptimizerBundle\ImageOptimizerBundle::class => ['all' => true],
+RomainGenin\ImageOptimizerBundle\ImageOptimizerBundle::class => ['all' => true],
 ```
 
 Pour les variantes responsives, importez les routes (`config/routes/image_optimizer.yaml`) :
@@ -172,7 +172,7 @@ Le bundle :
 Pour pré-remplir un champ « texte alternatif » de formulaire au moment de l'upload :
 
 ```php
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
 
 $metadata = $reader->read($uploadedFile->getPathname());
 $product->setImageAlt($metadata?->altText($request->getLocale()));
@@ -218,8 +218,8 @@ La pertinence des textes alternatifs, le texte incrusté dans les images et le c
 Pour une image qui n'arrive pas par une requête HTTP (import, Messenger, URL distante…) :
 
 ```php
-use StudioAstra\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
-use StudioAstra\ImageOptimizerBundle\Upload\UploadedFileOptimizer;
+use RomainGenin\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
+use RomainGenin\ImageOptimizerBundle\Upload\UploadedFileOptimizer;
 
 public function __construct(
     private ImageOptimizerInterface $optimizer,

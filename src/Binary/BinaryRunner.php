@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Binary;
+namespace RomainGenin\ImageOptimizerBundle\Binary;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;

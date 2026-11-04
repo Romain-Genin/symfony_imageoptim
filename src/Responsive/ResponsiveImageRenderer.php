@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Responsive;
+namespace RomainGenin\ImageOptimizerBundle\Responsive;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use StudioAstra\ImageOptimizerBundle\Exception\MissingAltTextException;
-use StudioAstra\ImageOptimizerBundle\FormatDetector;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
+use RomainGenin\ImageOptimizerBundle\Exception\MissingAltTextException;
+use RomainGenin\ImageOptimizerBundle\FormatDetector;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 

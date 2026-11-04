@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Optimizer;
+namespace RomainGenin\ImageOptimizerBundle\Optimizer;
 
 interface ImageOptimizerInterface
 {

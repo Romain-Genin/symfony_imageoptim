@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Optimizer;
+namespace RomainGenin\ImageOptimizerBundle\Optimizer;
 
-use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Metadata\ExifOrientation;
-use StudioAstra\ImageOptimizerBundle\Metadata\PngFile;
+use RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Metadata\ExifOrientation;
+use RomainGenin\ImageOptimizerBundle\Metadata\PngFile;
 
 /**
  * Strictly lossless format conversions (PNG/GIF/BMP/TIFF -> lossless WebP, BMP -> PNG).

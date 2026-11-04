@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Routing;
+namespace RomainGenin\ImageOptimizerBundle\Routing;
 
-use StudioAstra\ImageOptimizerBundle\Controller\ImageVariantController;
-use StudioAstra\ImageOptimizerBundle\Responsive\ResponsiveImageRenderer;
+use RomainGenin\ImageOptimizerBundle\Controller\ImageVariantController;
+use RomainGenin\ImageOptimizerBundle\Responsive\ResponsiveImageRenderer;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;

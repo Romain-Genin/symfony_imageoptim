@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Optimizer\Format;
+namespace RomainGenin\ImageOptimizerBundle\Optimizer\Format;
 
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Optimizer\OptimizerOptions;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Optimizer\OptimizerOptions;
 
 /**
  * Lossless optimizer for a given format: the decoded pixels of $target must be identical to $source.

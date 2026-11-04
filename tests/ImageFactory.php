@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Tests;
+namespace RomainGenin\ImageOptimizerBundle\Tests;
 
-use StudioAstra\ImageOptimizerBundle\Metadata\ExifOrientation;
+use RomainGenin\ImageOptimizerBundle\Metadata\ExifOrientation;
 
 /**
  * Generates test images on the fly.
@@ -157,7 +157,7 @@ final class ImageFactory
         }
 
         $path = self::path('anim.gif');
-        $runner = new \StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner();
+        $runner = new \RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner();
         if (!$runner->run('gifsicle', ['--loop', '--delay', '50', ...$frames, '-o', $path])) {
             return null;
         }

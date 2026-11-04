@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Tests\Optimizer;
+namespace RomainGenin\ImageOptimizerBundle\Tests\Optimizer;
 
 use PHPUnit\Framework\TestCase;
-use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
-use StudioAstra\ImageOptimizerBundle\FormatDetector;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
-use StudioAstra\ImageOptimizerBundle\Metadata\JpegFile;
-use StudioAstra\ImageOptimizerBundle\Optimizer\Format\GifOptimizer;
-use StudioAstra\ImageOptimizerBundle\Optimizer\Format\JpegOptimizer;
-use StudioAstra\ImageOptimizerBundle\Optimizer\Format\PngOptimizer;
-use StudioAstra\ImageOptimizerBundle\Optimizer\Format\SvgOptimizer;
-use StudioAstra\ImageOptimizerBundle\Optimizer\ImageOptimizer;
-use StudioAstra\ImageOptimizerBundle\Optimizer\LosslessConverter;
-use StudioAstra\ImageOptimizerBundle\Optimizer\OptimizerOptions;
-use StudioAstra\ImageOptimizerBundle\Tests\ImageFactory;
+use RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner;
+use RomainGenin\ImageOptimizerBundle\FormatDetector;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
+use RomainGenin\ImageOptimizerBundle\Metadata\JpegFile;
+use RomainGenin\ImageOptimizerBundle\Optimizer\Format\GifOptimizer;
+use RomainGenin\ImageOptimizerBundle\Optimizer\Format\JpegOptimizer;
+use RomainGenin\ImageOptimizerBundle\Optimizer\Format\PngOptimizer;
+use RomainGenin\ImageOptimizerBundle\Optimizer\Format\SvgOptimizer;
+use RomainGenin\ImageOptimizerBundle\Optimizer\ImageOptimizer;
+use RomainGenin\ImageOptimizerBundle\Optimizer\LosslessConverter;
+use RomainGenin\ImageOptimizerBundle\Optimizer\OptimizerOptions;
+use RomainGenin\ImageOptimizerBundle\Tests\ImageFactory;
 
 final class ImageOptimizerTest extends TestCase
 {
