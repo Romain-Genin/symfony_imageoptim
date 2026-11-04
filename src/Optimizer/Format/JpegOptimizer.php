@@ -6,6 +6,7 @@ namespace StudioAstra\ImageOptimizerBundle\Optimizer\Format;
 
 use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
 use StudioAstra\ImageOptimizerBundle\ImageFormat;
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
 use StudioAstra\ImageOptimizerBundle\Metadata\JpegFile;
 use StudioAstra\ImageOptimizerBundle\Optimizer\OptimizerOptions;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Workspace;
@@ -50,6 +51,7 @@ final class JpegOptimizer implements FormatOptimizerInterface
             return null;
         }
 
+        $xmp = $options->keepAccessibilityMetadata ? AccessibilityMetadata::fromXmp($jpeg->xmp())?->toXmp() : null;
         $steps = [];
         $bytes = null;
         $rotated = false;
@@ -72,7 +74,7 @@ final class JpegOptimizer implements FormatOptimizerInterface
         }
 
         if ($options->stripMetadata) {
-            $jpeg = $jpeg->stripMetadata(keepOrientation: !$rotated);
+            $jpeg = $jpeg->stripMetadata(keepOrientation: !$rotated, xmp: $xmp);
             $steps[] = 'metadata stripped';
         }
 

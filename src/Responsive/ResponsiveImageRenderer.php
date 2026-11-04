@@ -4,14 +4,25 @@ declare(strict_types=1);
 
 namespace StudioAstra\ImageOptimizerBundle\Responsive;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use StudioAstra\ImageOptimizerBundle\Exception\MissingAltTextException;
 use StudioAstra\ImageOptimizerBundle\FormatDetector;
 use StudioAstra\ImageOptimizerBundle\ImageFormat;
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Builds <picture> markup so that each device downloads the smallest suitable file:
  * the browser picks the format (AVIF > WebP > original) and the width (srcset + sizes,
  * taking screen size and pixel density into account).
+ *
+ * Accessibility:
+ *  - every image needs a text alternative: explicit "alt", the IPTC alt text embedded in
+ *    the file, or an explicit {decorative: true} (rendered as alt="");
+ *  - animated images get a static first frame for users who enabled "reduce motion".
  */
 final class ResponsiveImageRenderer
 {
@@ -24,6 +35,11 @@ final class ResponsiveImageRenderer
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly string $defaultSizes = '100vw',
         private readonly FormatDetector $detector = new FormatDetector(),
+        private readonly AccessibilityMetadataReader $accessibilityReader = new AccessibilityMetadataReader(),
+        private readonly ?RequestStack $requestStack = null,
+        private readonly bool $requireAlt = true,
+        private readonly bool $reducedMotion = true,
+        private readonly LoggerInterface $logger = new NullLogger(),
     ) {
     }
 
@@ -50,22 +66,42 @@ final class ResponsiveImageRenderer
     }
 
     /**
-     * @param array<string, scalar|null> $attributes HTML attributes for the <img> tag; "sizes" and "widths" are special
+     * Text alternatives embedded in the image file (IPTC accessibility fields, SVG <title>/<desc>).
+     */
+    public function accessibility(string $path): ?AccessibilityMetadata
+    {
+        $source = $this->storage->resolveSource($path);
+
+        return null !== $source ? $this->accessibilityReader->read($source) : null;
+    }
+
+    /**
+     * @param array<string, scalar|null> $attributes HTML attributes for the <img> tag; "sizes", "max_width"
+     *                                               and "decorative" are special
      */
     public function render(string $path, array $attributes = []): string
     {
         $sizes = (string) ($attributes['sizes'] ?? $this->defaultSizes);
         $maxWidth = isset($attributes['max_width']) ? (int) $attributes['max_width'] : null;
-        unset($attributes['sizes'], $attributes['max_width']);
+        $decorative = (bool) ($attributes['decorative'] ?? false);
+        unset($attributes['sizes'], $attributes['max_width'], $attributes['decorative']);
 
-        $attributes += ['alt' => '', 'loading' => 'lazy', 'decoding' => 'async'];
         $source = $this->storage->resolveSource($path);
+        $attributes = ['alt' => $this->altText($path, $source, $attributes['alt'] ?? null, $decorative)]
+            + $attributes
+            + ['loading' => 'lazy', 'decoding' => 'async'];
+
         $fallback = null !== $source ? $this->fallbackFormat($source) : null;
         $dimensions = null !== $source ? $this->generator->dimensions($source) : null;
+        $publicUrl = '/' . ltrim((string) (VariantStorage::normalizePath($path) ?? $path), '/');
 
-        // Vector, animated, unsupported or missing images: plain <img>.
+        if (null !== $source && null !== $dimensions && $this->generator->isAnimated($source)) {
+            return $this->renderAnimated($path, $source, $publicUrl, $dimensions, $sizes, $maxWidth, $attributes);
+        }
+
+        // Vector, unsupported or missing images: plain <img>.
         if (null === $source || null === $fallback || null === $dimensions || !$this->generator->supportsSource($source)) {
-            $attributes = ['src' => '/' . ltrim((string) (VariantStorage::normalizePath($path) ?? $path), '/')] + $attributes;
+            $attributes = ['src' => $publicUrl] + $attributes;
             if (null !== $dimensions) {
                 $attributes += ['width' => $dimensions[0], 'height' => $dimensions[1]];
             }
@@ -98,6 +134,79 @@ final class ResponsiveImageRenderer
         ] + $attributes) . '>';
 
         return $html . '</picture>';
+    }
+
+    /**
+     * Animated GIF/WebP/APNG: the original animation, plus a static first frame chosen by the
+     * browser when the user asked the system to reduce motion (WCAG 2.2.2 / 2.3.3).
+     *
+     * @param array{0: int, 1: int}      $dimensions
+     * @param array<string, scalar|null> $attributes
+     */
+    private function renderAnimated(string $path, string $source, string $publicUrl, array $dimensions, string $sizes, ?int $maxWidth, array $attributes): string
+    {
+        $img = '<img' . self::attributes(['src' => $publicUrl, 'width' => $dimensions[0], 'height' => $dimensions[1]] + $attributes) . '>';
+
+        $available = $this->generator->availableFormats();
+        $static = \in_array(ImageFormat::Webp, $available, true) ? ImageFormat::Webp : ImageFormat::Png;
+
+        if (!$this->reducedMotion || !\in_array($static, $available, true) || !$this->generator->supportsSource($source, allowAnimated: true)) {
+            if ($this->reducedMotion) {
+                $this->logger->warning('Animated image "{path}" has no static alternative for reduced motion (install webpmux for animated WebP).', ['path' => $path]);
+            }
+
+            return $img;
+        }
+
+        return '<picture>'
+            . '<source' . self::attributes([
+                'media' => '(prefers-reduced-motion: reduce)',
+                'type' => $static->mimeType(),
+                'srcset' => $this->srcset($path, $this->candidateWidths($dimensions[0], $maxWidth), $static),
+                'sizes' => $sizes,
+            ]) . '>'
+            . $img
+            . '</picture>';
+    }
+
+    private function altText(string $path, ?string $source, mixed $alt, bool $decorative): string
+    {
+        $alt = \is_scalar($alt) ? trim((string) $alt) : '';
+
+        if ($decorative) {
+            if ('' !== $alt) {
+                $this->fail(MissingAltTextException::decorativeWithAlt($path));
+            }
+
+            return '';
+        }
+
+        if ('' !== $alt) {
+            return $alt;
+        }
+
+        $embedded = null !== $source ? $this->accessibilityReader->read($source)?->altText($this->locale()) : null;
+        if (null !== $embedded && '' !== $embedded) {
+            return $embedded;
+        }
+
+        $this->fail(MissingAltTextException::forPath($path));
+
+        return '';
+    }
+
+    private function fail(MissingAltTextException $exception): void
+    {
+        if ($this->requireAlt) {
+            throw $exception;
+        }
+
+        $this->logger->warning($exception->getMessage());
+    }
+
+    private function locale(): ?string
+    {
+        return $this->requestStack?->getCurrentRequest()?->getLocale();
     }
 
     /**
@@ -161,6 +270,7 @@ final class ResponsiveImageRenderer
             if (null === $value || false === $value || !preg_match('/^[a-zA-Z_:][-a-zA-Z0-9_:.]*$/', $name)) {
                 continue;
             }
+            // alt="" must be kept: it is how decorative images are announced as such.
             $html .= true === $value
                 ? ' ' . $name
                 : ' ' . $name . '="' . htmlspecialchars((string) $value, \ENT_QUOTES | \ENT_SUBSTITUTE | \ENT_HTML5, 'UTF-8') . '"';

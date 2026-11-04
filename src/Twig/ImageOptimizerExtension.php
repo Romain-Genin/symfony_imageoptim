@@ -23,6 +23,8 @@ final class ImageOptimizerExtension extends AbstractExtension
             new TwigFunction('image_variant', $this->renderer->variantUrl(...)),
             // {{ image_auto('uploads/photo.jpg') }} (format + width negotiated per device)
             new TwigFunction('image_auto', $this->renderer->autoUrl(...)),
+            // {% set a11y = image_accessibility('uploads/chart.png') %} {{ a11y.extendedDescription(app.request.locale) }}
+            new TwigFunction('image_accessibility', $this->renderer->accessibility(...)),
         ];
     }
 }

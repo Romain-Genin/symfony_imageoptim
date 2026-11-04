@@ -10,6 +10,7 @@ namespace StudioAstra\ImageOptimizerBundle\Metadata;
 final class PngFile
 {
     private const SIGNATURE = "\x89PNG\r\n\x1A\n";
+    private const XMP_KEYWORD = 'XML:com.adobe.xmp';
 
     /** Ancillary chunks that never affect rendering. */
     private const METADATA_CHUNKS = ['tEXt', 'zTXt', 'iTXt', 'tIME', 'dSIG', 'vpAg', 'caNv', 'orNT', 'prVW', 'mkBF', 'mkTS', 'mkBS', 'mkBT', 'iDOT'];
@@ -131,7 +132,25 @@ final class PngFile
         return 1;
     }
 
-    public function stripMetadata(bool $keepOrientation = true): self
+    public function xmp(): ?string
+    {
+        foreach ($this->chunks as $chunk) {
+            if ('iTXt' !== $chunk['type'] || !str_starts_with($chunk['data'], self::XMP_KEYWORD . "\x00")) {
+                continue;
+            }
+            $data = substr($chunk['data'], \strlen(self::XMP_KEYWORD) + 1);
+            $compressed = "\x01" === ($data[0] ?? '');
+            // Skip compression flag/method, then language tag and translated keyword (both NUL-terminated).
+            $parts = explode("\x00", substr($data, 2), 3);
+            $text = $parts[2] ?? '';
+
+            return $compressed ? (@zlib_decode($text) ?: null) : $text;
+        }
+
+        return null;
+    }
+
+    public function stripMetadata(bool $keepOrientation = true, ?string $xmp = null): self
     {
         $orientation = $keepOrientation ? $this->orientation() : 1;
         $chunks = [];
@@ -147,6 +166,10 @@ final class PngFile
                 continue;
             }
             $chunks[] = $chunk;
+        }
+
+        if (null !== $xmp) {
+            array_splice($chunks, -1, 0, [['type' => 'iTXt', 'data' => self::XMP_KEYWORD . "\x00\x00\x00\x00\x00" . $xmp]]);
         }
 
         return new self($chunks);

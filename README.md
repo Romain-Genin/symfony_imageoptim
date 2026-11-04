@@ -11,6 +11,8 @@ puis les **sert dans le format et la taille adaptés à chaque appareil** (AVIF/
   de format sont en WebP *lossless*, et tout ce qui ne peut pas être converti à l'identique est refusé.
 - **Selon l'appareil** : `{{ responsive_image() }}` génère un `<picture>` ; le navigateur choisit
   AVIF > WebP > original et la largeur adaptée à l'écran et à la densité de pixels (DPR).
+- **Accessible** : texte alternatif obligatoire (ou image explicitement décorative), textes alternatifs
+  IPTC conservés dans les fichiers et réutilisés, version fixe des animations pour « réduire les animations ».
 
 ## Installation
 
@@ -47,6 +49,7 @@ Le bundle fonctionne en pur PHP + GD, mais donne de meilleurs résultats avec ce
 | `gifsicle` | `gifsicle` | GIF : `-O3` |
 | `avifenc` | `libavif-bin` | Variantes AVIF si GD n'a pas le support AVIF |
 | `svgo` | `npm i -g svgo` (v4 recommandée) | SVG : minification |
+| `webpmux` | `webp` | Version fixe des WebP animés (préférence « réduire les animations ») |
 
 ```bash
 apt-get install -y libjpeg-turbo-progs optipng webp gifsicle libavif-bin
@@ -67,7 +70,8 @@ apt-get install -y libjpeg-turbo-progs optipng webp gifsicle libavif-bin
 | SVG | svgo si installé | SVG minifié |
 | Autre chose (PDF, vidéo…) | ignoré | fichier intact |
 
-Toujours conservés : le profil couleur ICC (photos Display P3), l'orientation, la transparence.
+Toujours conservés : le profil couleur ICC (photos Display P3), l'orientation, la transparence, et les
+textes alternatifs IPTC (voir « Accessibilité »). Les autres métadonnées (GPS, auteur, appareil…) sont supprimées.
 Une conversion est refusée si elle ne peut pas être exacte (PNG 16 bits, APNG, chunks gamma, CMYK…).
 
 Quand le format change, le bundle remplace l'`UploadedFile` de la requête par une instance pointant sur
@@ -114,7 +118,7 @@ produit :
   sans PHP.
 - Les sources sans perte (PNG, GIF, WebP lossless) donnent des variantes WebP/AVIF sans perte.
   Les photos redimensionnées sont encodées en haute qualité (`quality`, réglable). **L'original n'est jamais modifié.**
-- SVG et images animées : `<img>` simple avec l'original.
+- SVG : `<img>` simple avec l'original. Images animées : l'original, plus une version fixe (voir ci-dessous).
 
 Autres fonctions Twig :
 
@@ -127,6 +131,82 @@ Autres fonctions Twig :
 (`Sec-CH-Width`, `Sec-CH-DPR`, `Sec-CH-Viewport-Width`) — utile pour les `background-image` CSS,
 Open Graph, e-mails… Le bundle ajoute `Accept-CH` sur les réponses HTML pour que Chrome/Edge envoient
 ces informations. Sans Client Hints, `default_width` est utilisée.
+
+## Accessibilité
+
+### Texte alternatif obligatoire (WCAG 1.1.1)
+
+`responsive_image()` exige de choisir explicitement :
+
+```twig
+{{ responsive_image('uploads/chat.jpg', {alt: 'Un chat noir sur un canapé rouge'}) }}
+{{ responsive_image('uploads/motif.png', {decorative: true}) }}   {# rendu avec alt="" #}
+```
+
+Sans `alt` (ou avec un `alt` vide ou ne contenant que des espaces, typiquement `{alt: produit.alt}` jamais rempli),
+le bundle cherche le texte alternatif **intégré au fichier** (voir ci-dessous). S'il n'en trouve pas :
+
+- avec `require_alt: true` (par défaut en debug), une `MissingAltTextException` est levée : l'oubli se voit tout de suite
+  en développement ;
+- sinon (par défaut en production), un avertissement est écrit dans les logs et l'image est rendue avec `alt=""`.
+
+`decorative: true` combiné à un `alt` non vide est refusé, car c'est contradictoire.
+
+### Textes alternatifs intégrés aux images (IPTC)
+
+Lightroom, Photoshop, les banques d'images et certains CMS enregistrent dans le fichier les champs IPTC
+**Alt Text (Accessibility)** et **Extended Description (Accessibility)**, éventuellement en plusieurs langues.
+Le bundle :
+
+- les **conserve** lors du nettoyage des métadonnées (JPEG, PNG, et après conversion en WebP) en ne gardant
+  qu'un XMP minimal : le GPS, l'auteur, etc. sont bien supprimés ;
+- les **utilise** comme `alt` par défaut dans `responsive_image()`, dans la langue de la requête (`fr`, `fr_FR`…),
+  sinon `x-default` ;
+- lit aussi le `<title>` (ou l'`aria-label`) et le `<desc>` des SVG.
+
+Pour pré-remplir un champ « texte alternatif » de formulaire au moment de l'upload :
+
+```php
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
+
+$metadata = $reader->read($uploadedFile->getPathname());
+$product->setImageAlt($metadata?->altText($request->getLocale()));
+$product->setImageDescription($metadata?->extendedDescription($request->getLocale()));
+```
+
+Pour une description longue (graphique, schéma…), affichée à côté de l'image :
+
+```twig
+{% set a11y = image_accessibility('uploads/graphique.png') %}
+<figure>
+    {{ responsive_image('uploads/graphique.png', {alt: 'Ventes 2026 par trimestre', 'aria-describedby': 'desc-ventes'}) }}
+    {% if a11y and a11y.extendedDescription(app.request.locale) %}
+        <figcaption id="desc-ventes">{{ a11y.extendedDescription(app.request.locale) }}</figcaption>
+    {% endif %}
+</figure>
+```
+
+### Animations et « réduire les animations » (WCAG 2.2.2 / 2.3.3)
+
+Pour un GIF, WebP ou PNG animé, `responsive_image()` produit :
+
+```html
+<picture>
+  <source media="(prefers-reduced-motion: reduce)" type="image/webp" srcset="/_image/320/uploads/anim.gif.webp 320w, …">
+  <img src="/uploads/anim.gif" width="480" height="270" alt="…">
+</picture>
+```
+
+Les personnes ayant activé « réduire les animations » dans leur système (troubles vestibulaires, épilepsie,
+troubles de l'attention) voient la **première image fixe** ; les autres voient l'animation. Les WebP animés
+nécessitent `webpmux` (paquet `webp`). Désactivable avec `responsive.reduced_motion: false`.
+
+Cela ne remplace pas un bouton pause pour les animations de plus de 5 secondes affichées à tout le monde :
+pour celles-ci, préférez une vidéo `<video>` avec contrôles.
+
+### Ce qui reste de votre ressort
+
+La pertinence des textes alternatifs, le texte incrusté dans les images et le contraste des visuels relèvent du contenu.
 
 ## Utilisation manuelle
 
@@ -172,6 +252,7 @@ image_optimizer:
         auto_orient: true
         min_conversion_gain: 0.05  # une conversion doit faire gagner au moins 5 %
         max_pixels: 50000000       # garde-fou mémoire
+        keep_accessibility_metadata: true   # conserver les textes alternatifs IPTC
         conversions:
             png: webp              # webp | false
             gif: webp              # webp | png | false
@@ -187,6 +268,7 @@ image_optimizer:
         cwebp: ~
         avifenc: ~
         svgo: ~
+        webpmux: ~
     responsive:
         enabled: true
         route_prefix: /_image
@@ -198,6 +280,8 @@ image_optimizer:
         quality: { webp: 90, avif: 80, jpeg: 90 }
         default_sizes: 100vw
         cache_max_age: 2592000
+        require_alt: '%kernel.debug%'  # exception si ni alt ni decorative: true (sinon log)
+        reduced_motion: true       # version fixe des animations pour prefers-reduced-motion
         client_hints: true
 ```
 

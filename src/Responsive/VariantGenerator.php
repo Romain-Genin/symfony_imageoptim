@@ -9,6 +9,7 @@ use StudioAstra\ImageOptimizerBundle\FormatDetector;
 use StudioAstra\ImageOptimizerBundle\ImageFormat;
 use StudioAstra\ImageOptimizerBundle\Metadata\JpegFile;
 use StudioAstra\ImageOptimizerBundle\Metadata\PngFile;
+use StudioAstra\ImageOptimizerBundle\Metadata\WebpFile;
 use StudioAstra\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
 use StudioAstra\ImageOptimizerBundle\Optimizer\LosslessConverter;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Workspace;
@@ -53,11 +54,21 @@ final class VariantGenerator
         return $formats;
     }
 
-    public function supportsSource(string $path): bool
+    /**
+     * @param bool $allowAnimated animated sources are supported as a static first frame
+     *                            (used for prefers-reduced-motion)
+     */
+    public function supportsSource(string $path, bool $allowAnimated = false): bool
     {
         $format = $this->detector->detect($path);
+        if (null === $format || !$format->isGdReadable()) {
+            return false;
+        }
+        if (!$this->isAnimated($path, $format)) {
+            return true;
+        }
 
-        return null !== $format && $format->isGdReadable() && !$this->isAnimated($path, $format);
+        return $allowAnimated && (ImageFormat::Webp !== $format || $this->binaries->has('webpmux'));
     }
 
     /**
@@ -82,7 +93,7 @@ final class VariantGenerator
         return match ($format) {
             ImageFormat::Gif => LosslessConverter::isAnimatedGif($path),
             ImageFormat::Png => (bool) PngFile::parse((string) file_get_contents($path))?->isAnimated(),
-            ImageFormat::Webp => str_contains((string) file_get_contents($path, false, null, 0, 64), 'ANIM'),
+            ImageFormat::Webp => (bool) WebpFile::parse((string) file_get_contents($path))?->isAnimated(),
             default => false,
         };
     }
@@ -111,11 +122,14 @@ final class VariantGenerator
         $tmp = $workspace->path($format->extension());
         $width = max(1, min($width, $srcWidth));
 
-        if ($width === $srcWidth && $format === $sourceFormat && 1 === $this->orientation($source, $sourceFormat)) {
+        $animated = $this->isAnimated($source, $sourceFormat);
+
+        if ($width === $srcWidth && $format === $sourceFormat && !$animated && 1 === $this->orientation($source, $sourceFormat)) {
             // Nothing to resize or convert: the (already optimized) original is the best variant.
             copy($source, $tmp);
         } else {
-            $image = $this->load($source, $sourceFormat);
+            // Animated sources: the variant is the static first frame (prefers-reduced-motion).
+            $image = $this->load($animated && ImageFormat::Webp === $sourceFormat ? $this->firstWebpFrame($source, $workspace) : $source, $sourceFormat);
             if ($width !== imagesx($image)) {
                 $image = $this->resize($image, $width, max(1, (int) round($srcHeight * $width / $srcWidth)));
             }
@@ -125,6 +139,16 @@ final class VariantGenerator
         if (!rename($tmp, $target)) {
             throw new \RuntimeException(sprintf('Unable to write "%s".', $target));
         }
+    }
+
+    private function firstWebpFrame(string $source, Workspace $workspace): string
+    {
+        $frame = $workspace->path('webp');
+        if (!$this->binaries->run('webpmux', ['-get', 'frame', '1', $source, '-o', $frame])) {
+            throw new \RuntimeException('Unable to extract the first frame of an animated WebP (webpmux is required).');
+        }
+
+        return $frame;
     }
 
     private function load(string $path, ImageFormat $format): \GdImage
@@ -249,7 +273,7 @@ final class VariantGenerator
     {
         return match ($format) {
             ImageFormat::Png, ImageFormat::Gif, ImageFormat::Bmp => true,
-            ImageFormat::Webp => str_contains((string) file_get_contents($path, false, null, 0, 64), 'VP8L'),
+            ImageFormat::Webp => (bool) WebpFile::parse((string) file_get_contents($path))?->isLossless(),
             default => false,
         };
     }

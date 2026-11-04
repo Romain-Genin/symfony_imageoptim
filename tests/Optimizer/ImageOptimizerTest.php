@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
 use StudioAstra\ImageOptimizerBundle\FormatDetector;
 use StudioAstra\ImageOptimizerBundle\ImageFormat;
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
 use StudioAstra\ImageOptimizerBundle\Metadata\JpegFile;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Format\GifOptimizer;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Format\JpegOptimizer;
@@ -193,6 +194,60 @@ final class ImageOptimizerTest extends TestCase
         self::assertSame(ImageFormat::Webp, $result->format);
         self::assertLessThan($result->originalSize / 2, $result->size);
         self::assertSame(0, ImageFactory::diff($before, ImageFactory::load($path)));
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('binaryModes')]
+    public function testJpegKeepsAccessibilityTextButNotPersonalData(bool $withBinaries): void
+    {
+        $path = ImageFactory::jpeg(ImageFactory::photo());
+        ImageFactory::addJpegXmp($path, ImageFactory::accessibilityXmp());
+        $before = ImageFactory::load($path);
+
+        $this->optimizer($withBinaries)->optimize($path);
+
+        $metadata = (new AccessibilityMetadataReader())->read($path);
+        self::assertSame('Un chat noir sur un canapé rouge', $metadata?->altText('fr'));
+        self::assertSame('The cat is sleeping, curled up, next to a blue cushion.', $metadata?->extendedDescription());
+        self::assertStringNotContainsString('jane@example.com', (string) file_get_contents($path));
+        self::assertStringNotContainsString('GPSLatitude', (string) file_get_contents($path));
+        self::assertSame(0, ImageFactory::diff($before, ImageFactory::load($path)));
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('binaryModes')]
+    public function testAccessibilityTextSurvivesPngToWebpConversion(bool $withBinaries): void
+    {
+        $path = ImageFactory::png(ImageFactory::graphic(alpha: false));
+        ImageFactory::addPngXmp($path, ImageFactory::accessibilityXmp());
+        $before = ImageFactory::load($path);
+
+        $result = $this->optimizer($withBinaries)->optimize($path);
+
+        self::assertSame(ImageFormat::Webp, $result->format);
+        self::assertSame('A black cat on a red sofa', (new AccessibilityMetadataReader())->read($path)?->altText());
+        self::assertStringNotContainsString('jane@example.com', (string) file_get_contents($path));
+        self::assertSame([200, 120], \array_slice(getimagesize($path), 0, 2));
+        self::assertSame(0, ImageFactory::diff($before, ImageFactory::load($path)));
+    }
+
+    public function testPngKeepsAccessibilityText(): void
+    {
+        $path = ImageFactory::png(ImageFactory::graphic(alpha: false));
+        ImageFactory::addPngXmp($path, ImageFactory::accessibilityXmp());
+
+        $this->optimizer()->optimize($path, allowConversion: false);
+
+        self::assertSame('A black cat on a red sofa', (new AccessibilityMetadataReader())->read($path)?->altText());
+        self::assertStringNotContainsString('jane@example.com', (string) file_get_contents($path));
+    }
+
+    public function testAccessibilityMetadataCanBeDropped(): void
+    {
+        $path = ImageFactory::jpeg(ImageFactory::photo());
+        ImageFactory::addJpegXmp($path, ImageFactory::accessibilityXmp());
+
+        $this->optimizer(options: new OptimizerOptions(keepAccessibilityMetadata: false))->optimize($path);
+
+        self::assertNull((new AccessibilityMetadataReader())->read($path));
     }
 
     public function testNonImagesAreIgnored(): void

@@ -9,6 +9,7 @@ use StudioAstra\ImageOptimizerBundle\Command\OptimizeImagesCommand;
 use StudioAstra\ImageOptimizerBundle\Controller\ImageVariantController;
 use StudioAstra\ImageOptimizerBundle\EventListener\ClientHintsListener;
 use StudioAstra\ImageOptimizerBundle\EventListener\OptimizeUploadedImagesListener;
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Format\GifOptimizer;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Format\JpegOptimizer;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Format\PngOptimizer;
@@ -34,7 +35,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_it
 
 final class ImageOptimizerBundle extends AbstractBundle
 {
-    private const BINARIES = ['jpegtran', 'oxipng', 'optipng', 'gifsicle', 'gif2webp', 'cwebp', 'avifenc', 'svgo'];
+    private const BINARIES = ['jpegtran', 'oxipng', 'optipng', 'gifsicle', 'gif2webp', 'cwebp', 'avifenc', 'svgo', 'webpmux'];
 
     public function configure(DefinitionConfigurator $definition): void
     {
@@ -59,6 +60,7 @@ final class ImageOptimizerBundle extends AbstractBundle
                 ->booleanNode('auto_orient')->defaultTrue()->info('Losslessly rotate JPEGs according to EXIF orientation (jpegtran -perfect).')->end()
                 ->floatNode('min_conversion_gain')->defaultValue(0.05)->min(0)->max(1)->info('A format conversion is kept only if it saves at least this ratio.')->end()
                 ->integerNode('max_pixels')->defaultValue(50_000_000)->info('Images above this pixel count are skipped (memory guard).')->end()
+                ->booleanNode('keep_accessibility_metadata')->defaultTrue()->info('Keep the IPTC "Alt Text (Accessibility)" / "Extended Description" fields when stripping metadata.')->end()
                 ->arrayNode('conversions')
                     ->addDefaultsIfNotSet()
                     ->info('Lossless format conversions (false = keep the format). JPEG is never converted: it would lose quality.')
@@ -103,6 +105,8 @@ final class ImageOptimizerBundle extends AbstractBundle
                 ->end()
                 ->scalarNode('default_sizes')->defaultValue('100vw')->end()
                 ->integerNode('cache_max_age')->defaultValue(2_592_000)->end()
+                ->scalarNode('require_alt')->defaultValue('%kernel.debug%')->info('Throw when responsive_image() gets no alt text and no {decorative: true} (otherwise a warning is logged).')->end()
+                ->booleanNode('reduced_motion')->defaultTrue()->info('Offer a static first frame of animated images to users who prefer reduced motion.')->end()
                 ->booleanNode('client_hints')->defaultTrue()->info('Send Accept-CH on HTML responses so browsers report DPR / viewport width.')->end()
             ->end();
     }
@@ -134,7 +138,10 @@ final class ImageOptimizerBundle extends AbstractBundle
             $optimization['conversions'],
             $optimization['min_conversion_gain'],
             $optimization['max_pixels'],
+            $optimization['keep_accessibility_metadata'],
         ]);
+
+        $services->set(AccessibilityMetadataReader::class)->args([service(FormatDetector::class)])->public();
 
         $services->set(ImageOptimizer::class)
             ->args([
@@ -143,6 +150,7 @@ final class ImageOptimizerBundle extends AbstractBundle
                 service(OptimizerOptions::class),
                 service(FormatDetector::class),
                 service('logger')->nullOnInvalid(),
+                service(AccessibilityMetadataReader::class),
             ])
             ->tag('monolog.logger', ['channel' => 'image_optimizer']);
         $services->alias(ImageOptimizerInterface::class, ImageOptimizer::class)->public();
@@ -191,8 +199,20 @@ final class ImageOptimizerBundle extends AbstractBundle
         ]);
 
         $services->set(ResponsiveImageRenderer::class)
-            ->args([service(VariantStorage::class), service(VariantGenerator::class), service('router'), $responsive['default_sizes'], service(FormatDetector::class)])
-            ->public();
+            ->args([
+                service(VariantStorage::class),
+                service(VariantGenerator::class),
+                service('router'),
+                $responsive['default_sizes'],
+                service(FormatDetector::class),
+                service(AccessibilityMetadataReader::class),
+                service('request_stack')->nullOnInvalid(),
+                $responsive['require_alt'],
+                $responsive['reduced_motion'],
+                service('logger')->nullOnInvalid(),
+            ])
+            ->public()
+            ->tag('monolog.logger', ['channel' => 'image_optimizer']);
 
         $services->set(ImageVariantController::class)
             ->args([
