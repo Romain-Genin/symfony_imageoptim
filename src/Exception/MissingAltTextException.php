@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Exception;
+namespace RomainGenin\ImageOptimizerBundle\Exception;
 
 /**
  * Thrown (when image_optimizer.responsive.require_alt is enabled, by default in debug)

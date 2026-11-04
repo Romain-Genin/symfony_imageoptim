@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle;
+namespace RomainGenin\ImageOptimizerBundle;
 
 /**
  * Detects the real format of an image from its content (magic bytes),

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Optimizer\Format;
+namespace RomainGenin\ImageOptimizerBundle\Optimizer\Format;
 
-use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
-use StudioAstra\ImageOptimizerBundle\Metadata\PngFile;
-use StudioAstra\ImageOptimizerBundle\Optimizer\OptimizerOptions;
-use StudioAstra\ImageOptimizerBundle\Optimizer\Workspace;
+use RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
+use RomainGenin\ImageOptimizerBundle\Metadata\PngFile;
+use RomainGenin\ImageOptimizerBundle\Optimizer\OptimizerOptions;
+use RomainGenin\ImageOptimizerBundle\Optimizer\Workspace;
 
 /**
  * Lossless PNG optimization: metadata removal + zlib level 9 (pure PHP), then oxipng or

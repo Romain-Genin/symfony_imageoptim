@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Metadata;
+namespace RomainGenin\ImageOptimizerBundle\Metadata;
 
 /**
  * Pure PHP, lossless JPEG marker manipulation.

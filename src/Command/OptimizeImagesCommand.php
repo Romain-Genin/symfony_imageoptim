@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Command;
+namespace RomainGenin\ImageOptimizerBundle\Command;
 
-use StudioAstra\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
-use StudioAstra\ImageOptimizerBundle\Upload\UploadedFileOptimizer;
+use RomainGenin\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
+use RomainGenin\ImageOptimizerBundle\Upload\UploadedFileOptimizer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Responsive;
+namespace RomainGenin\ImageOptimizerBundle\Responsive;
 
-use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
-use StudioAstra\ImageOptimizerBundle\FormatDetector;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Metadata\JpegFile;
-use StudioAstra\ImageOptimizerBundle\Metadata\PngFile;
-use StudioAstra\ImageOptimizerBundle\Metadata\WebpFile;
-use StudioAstra\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
-use StudioAstra\ImageOptimizerBundle\Optimizer\LosslessConverter;
-use StudioAstra\ImageOptimizerBundle\Optimizer\Workspace;
+use RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner;
+use RomainGenin\ImageOptimizerBundle\FormatDetector;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Metadata\JpegFile;
+use RomainGenin\ImageOptimizerBundle\Metadata\PngFile;
+use RomainGenin\ImageOptimizerBundle\Metadata\WebpFile;
+use RomainGenin\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
+use RomainGenin\ImageOptimizerBundle\Optimizer\LosslessConverter;
+use RomainGenin\ImageOptimizerBundle\Optimizer\Workspace;
 
 /**
  * Generates device-sized variants (width + modern format) of an original image.

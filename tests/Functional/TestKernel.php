@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Tests\Functional;
+namespace RomainGenin\ImageOptimizerBundle\Tests\Functional;
 
-use StudioAstra\ImageOptimizerBundle\ImageOptimizerBundle;
+use RomainGenin\ImageOptimizerBundle\ImageOptimizerBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\TwigBundle\TwigBundle;

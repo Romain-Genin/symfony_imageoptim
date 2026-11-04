@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Optimizer;
+namespace RomainGenin\ImageOptimizerBundle\Optimizer;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use StudioAstra\ImageOptimizerBundle\FormatDetector;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
-use StudioAstra\ImageOptimizerBundle\Metadata\PngFile;
-use StudioAstra\ImageOptimizerBundle\Metadata\WebpFile;
-use StudioAstra\ImageOptimizerBundle\Optimizer\Format\FormatOptimizerInterface;
+use RomainGenin\ImageOptimizerBundle\FormatDetector;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
+use RomainGenin\ImageOptimizerBundle\Metadata\PngFile;
+use RomainGenin\ImageOptimizerBundle\Metadata\WebpFile;
+use RomainGenin\ImageOptimizerBundle\Optimizer\Format\FormatOptimizerInterface;
 
 final class ImageOptimizer implements ImageOptimizerInterface
 {

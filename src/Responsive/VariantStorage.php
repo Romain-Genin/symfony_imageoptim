@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Responsive;
+namespace RomainGenin\ImageOptimizerBundle\Responsive;
 
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
 
 /**
  * Resolves original images and their cached variants on disk.

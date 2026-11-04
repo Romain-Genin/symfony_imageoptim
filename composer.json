@@ -17,17 +17,17 @@
         "a11y",
         "alt-text"
     ],
-    "homepage": "https://github.com/StudioAstra/ImageOptimizer",
+    "homepage": "https://github.com/Romain-Genin/symfony_imageoptim",
     "license": "MIT",
     "authors": [
         {
-            "name": "Studio Astra",
-            "homepage": "https://github.com/StudioAstra"
+            "name": "Romain Genin",
+            "email": "romaingenin@icloud.com"
         }
     ],
     "support": {
-        "issues": "https://github.com/StudioAstra/ImageOptimizer/issues",
-        "source": "https://github.com/StudioAstra/ImageOptimizer"
+        "issues": "https://github.com/Romain-Genin/symfony_imageoptim/issues",
+        "source": "https://github.com/Romain-Genin/symfony_imageoptim"
     },
     "require": {
         "php": ">=8.1",
@@ -59,12 +59,12 @@
     },
     "autoload": {
         "psr-4": {
-            "StudioAstra\\ImageOptimizerBundle\\": "src/"
+            "RomainGenin\\ImageOptimizerBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "StudioAstra\\ImageOptimizerBundle\\Tests\\": "tests/"
+            "RomainGenin\\ImageOptimizerBundle\\Tests\\": "tests/"
         }
     },
     "config": {
@@ -72,7 +72,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.x-dev"
+            "dev-main": "2.x-dev"
         }
     }
 }

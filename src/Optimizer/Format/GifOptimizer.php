@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Optimizer\Format;
+namespace RomainGenin\ImageOptimizerBundle\Optimizer\Format;
 
-use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Optimizer\OptimizerOptions;
+use RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Optimizer\OptimizerOptions;
 
 /**
  * Lossless GIF optimization with gifsicle (-O3, without its lossy mode). Animations are kept.

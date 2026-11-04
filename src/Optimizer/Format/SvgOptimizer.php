@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Optimizer\Format;
+namespace RomainGenin\ImageOptimizerBundle\Optimizer\Format;
 
-use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
-use StudioAstra\ImageOptimizerBundle\Optimizer\OptimizerOptions;
+use RomainGenin\ImageOptimizerBundle\Binary\BinaryRunner;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\Optimizer\OptimizerOptions;
 
 /**
  * SVG minification with svgo (default preset only renders-identical transforms).

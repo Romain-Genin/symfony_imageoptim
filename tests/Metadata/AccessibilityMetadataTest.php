@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Tests\Metadata;
+namespace RomainGenin\ImageOptimizerBundle\Tests\Metadata;
 
 use PHPUnit\Framework\TestCase;
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
-use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
-use StudioAstra\ImageOptimizerBundle\Tests\ImageFactory;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
+use RomainGenin\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
+use RomainGenin\ImageOptimizerBundle\Tests\ImageFactory;
 
 final class AccessibilityMetadataTest extends TestCase
 {

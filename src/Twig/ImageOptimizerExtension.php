@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Twig;
+namespace RomainGenin\ImageOptimizerBundle\Twig;
 
-use StudioAstra\ImageOptimizerBundle\Responsive\ResponsiveImageRenderer;
+use RomainGenin\ImageOptimizerBundle\Responsive\ResponsiveImageRenderer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

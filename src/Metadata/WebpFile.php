@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Metadata;
+namespace RomainGenin\ImageOptimizerBundle\Metadata;
 
 /**
  * Pure PHP WebP (RIFF) container manipulation: read / write the XMP chunk.

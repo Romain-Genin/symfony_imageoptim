@@ -6,6 +6,14 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-04
+
+### Modifié (rupture)
+
+- Namespace PHP renommé `StudioAstra\ImageOptimizerBundle` → `RomainGenin\ImageOptimizerBundle` : mettez à jour `config/bundles.php`
+  et vos `use`.
+- Toutes les références au paquet utilisent son nom Composer `romain-genin/symfony-image-optimizer-bundle` (chemins `vendor/…` compris).
+
 ## [1.0.0] - 2026-11-04
 
 ### Ajouté
@@ -29,5 +37,6 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le pr
 - Commande `image-optimizer:optimize` pour les images déjà stockées.
 - Compatible PHP 8.1+ et Symfony 6.4, 7.x, 8.x.
 
-[Unreleased]: https://github.com/StudioAstra/ImageOptimizer/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/StudioAstra/ImageOptimizer/releases/tag/v1.0.0
+[Unreleased]: https://github.com/Romain-Genin/symfony_imageoptim/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Romain-Genin/symfony_imageoptim/compare/v1.0.0...v2.0.0
+[1.0.0]: https://github.com/Romain-Genin/symfony_imageoptim/releases/tag/v1.0.0

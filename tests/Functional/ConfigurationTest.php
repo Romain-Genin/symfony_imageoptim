@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Tests\Functional;
+namespace RomainGenin\ImageOptimizerBundle\Tests\Functional;
 
 use PHPUnit\Framework\TestCase;
-use StudioAstra\ImageOptimizerBundle\ImageOptimizerBundle;
+use RomainGenin\ImageOptimizerBundle\ImageOptimizerBundle;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

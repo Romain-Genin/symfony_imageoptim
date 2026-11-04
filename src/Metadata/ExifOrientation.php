@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Metadata;
+namespace RomainGenin\ImageOptimizerBundle\Metadata;
 
 /**
  * Minimal TIFF/EXIF helpers: reads IFD0 tags (Orientation, BitsPerSample...) and builds a

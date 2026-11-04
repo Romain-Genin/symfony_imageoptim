@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Optimizer;
+namespace RomainGenin\ImageOptimizerBundle\Optimizer;
 
-use StudioAstra\ImageOptimizerBundle\ImageFormat;
+use RomainGenin\ImageOptimizerBundle\ImageFormat;
 
 final class OptimizerOptions
 {

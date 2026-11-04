@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace StudioAstra\ImageOptimizerBundle\Upload;
+namespace RomainGenin\ImageOptimizerBundle\Upload;
 
-use StudioAstra\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
+use RomainGenin\ImageOptimizerBundle\Optimizer\ImageOptimizerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
