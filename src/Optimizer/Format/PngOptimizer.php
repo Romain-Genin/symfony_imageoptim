@@ -6,6 +6,7 @@ namespace StudioAstra\ImageOptimizerBundle\Optimizer\Format;
 
 use StudioAstra\ImageOptimizerBundle\Binary\BinaryRunner;
 use StudioAstra\ImageOptimizerBundle\ImageFormat;
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
 use StudioAstra\ImageOptimizerBundle\Metadata\PngFile;
 use StudioAstra\ImageOptimizerBundle\Optimizer\OptimizerOptions;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Workspace;
@@ -35,7 +36,8 @@ final class PngOptimizer implements FormatOptimizerInterface
 
         $steps = [];
         if ($options->stripMetadata) {
-            $png = $png->stripMetadata();
+            $xmp = $options->keepAccessibilityMetadata ? AccessibilityMetadata::fromXmp($png->xmp())?->toXmp() : null;
+            $png = $png->stripMetadata(xmp: $xmp);
             $steps[] = 'metadata stripped';
         }
         $png = $png->recompress();

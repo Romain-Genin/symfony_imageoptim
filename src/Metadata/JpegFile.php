@@ -12,6 +12,8 @@ namespace StudioAstra\ImageOptimizerBundle\Metadata;
  */
 final class JpegFile
 {
+    private const XMP_HEADER = "http://ns.adobe.com/xap/1.0/\x00";
+
     /**
      * @param list<array{marker: int, data: string}> $segments segments located before the first SOS (data excludes marker + length)
      */
@@ -107,6 +109,17 @@ final class JpegFile
         return null;
     }
 
+    public function xmp(): ?string
+    {
+        foreach ($this->segments as $segment) {
+            if (0xE1 === $segment['marker'] && str_starts_with($segment['data'], self::XMP_HEADER)) {
+                return substr($segment['data'], \strlen(self::XMP_HEADER));
+            }
+        }
+
+        return null;
+    }
+
     public function orientation(): int
     {
         foreach ($this->segments as $segment) {
@@ -140,9 +153,10 @@ final class JpegFile
     /**
      * Removes EXIF (GPS, camera, thumbnails), XMP, IPTC, comments and vendor blocks.
      * Keeps everything that affects rendering: JFIF, ICC profile (APP2), Adobe (APP14),
-     * tables and frame headers, plus the orientation as a minimal EXIF block.
+     * tables and frame headers, plus the orientation as a minimal EXIF block and,
+     * optionally, a replacement XMP packet (accessibility text alternatives).
      */
-    public function stripMetadata(bool $keepOrientation = true): self
+    public function stripMetadata(bool $keepOrientation = true, ?string $xmp = null): self
     {
         $orientation = $keepOrientation ? $this->orientation() : 1;
         $kept = [];
@@ -163,11 +177,15 @@ final class JpegFile
             }
         }
 
+        $insertAt = isset($kept[0]) && 0xE0 === $kept[0]['marker'] ? 1 : 0;
+        $inserted = [];
         if ($orientation > 1) {
-            $exif = ['marker' => 0xE1, 'data' => "Exif\x00\x00" . ExifOrientation::buildTiff($orientation)];
-            $insertAt = isset($kept[0]) && 0xE0 === $kept[0]['marker'] ? 1 : 0;
-            array_splice($kept, $insertAt, 0, [$exif]);
+            $inserted[] = ['marker' => 0xE1, 'data' => "Exif\x00\x00" . ExifOrientation::buildTiff($orientation)];
         }
+        if (null !== $xmp && \strlen($xmp) < 65000) {
+            $inserted[] = ['marker' => 0xE1, 'data' => self::XMP_HEADER . $xmp];
+        }
+        array_splice($kept, $insertAt, 0, $inserted);
 
         return new self($kept, $this->scan, '');
     }

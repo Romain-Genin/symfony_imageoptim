@@ -8,6 +8,10 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use StudioAstra\ImageOptimizerBundle\FormatDetector;
 use StudioAstra\ImageOptimizerBundle\ImageFormat;
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadata;
+use StudioAstra\ImageOptimizerBundle\Metadata\AccessibilityMetadataReader;
+use StudioAstra\ImageOptimizerBundle\Metadata\PngFile;
+use StudioAstra\ImageOptimizerBundle\Metadata\WebpFile;
 use StudioAstra\ImageOptimizerBundle\Optimizer\Format\FormatOptimizerInterface;
 
 final class ImageOptimizer implements ImageOptimizerInterface
@@ -21,6 +25,7 @@ final class ImageOptimizer implements ImageOptimizerInterface
         private readonly OptimizerOptions $options = new OptimizerOptions(),
         private readonly FormatDetector $detector = new FormatDetector(),
         private readonly LoggerInterface $logger = new NullLogger(),
+        private readonly AccessibilityMetadataReader $accessibilityReader = new AccessibilityMetadataReader(),
     ) {
     }
 
@@ -63,6 +68,7 @@ final class ImageOptimizer implements ImageOptimizerInterface
             return OptimizationResult::skipped($path, $format, $size, 'image too large');
         }
 
+        $accessibility = $this->options->keepAccessibilityMetadata ? $this->accessibilityReader->read($path) : null;
         $workspace = new Workspace();
         $bestPath = $path;
         $bestSize = $size;
@@ -95,6 +101,10 @@ final class ImageOptimizer implements ImageOptimizerInterface
                     }
                 }
 
+                if (null !== $accessibility) {
+                    $this->embedAccessibility($converted, $target, $accessibility);
+                }
+
                 clearstatcache(true, $converted);
                 $convertedSize = (int) filesize($converted);
                 if ($convertedSize > 0
@@ -118,6 +128,23 @@ final class ImageOptimizer implements ImageOptimizerInterface
         $workspace->cleanup();
 
         return new OptimizationResult($path, $format, $bestFormat, $size, $bestSize, $steps);
+    }
+
+    /**
+     * Converters do not carry XMP over: re-attach the text alternatives to the new file.
+     */
+    private function embedAccessibility(string $path, ImageFormat $format, AccessibilityMetadata $metadata): void
+    {
+        $bytes = (string) file_get_contents($path);
+        $updated = match ($format) {
+            ImageFormat::Webp => WebpFile::parse($bytes)?->withXmp($metadata->toXmp())?->toBytes(),
+            ImageFormat::Png => PngFile::parse($bytes)?->stripMetadata(xmp: $metadata->toXmp())->toBytes(),
+            default => null,
+        };
+
+        if (null !== $updated) {
+            file_put_contents($path, $updated);
+        }
     }
 
     /**

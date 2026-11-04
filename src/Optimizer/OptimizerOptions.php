@@ -17,6 +17,7 @@ final class OptimizerOptions
         public readonly array $conversions = ['png' => 'webp', 'gif' => 'webp', 'bmp' => 'webp', 'tiff' => 'webp'],
         public readonly float $minConversionGain = 0.05,
         public readonly int $maxPixels = 50_000_000,
+        public readonly bool $keepAccessibilityMetadata = true,
     ) {
     }
 

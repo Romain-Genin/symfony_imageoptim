@@ -50,7 +50,7 @@ final class ImageVariantController
             throw new NotFoundHttpException('Unknown format.');
         }
 
-        $response = $this->serve($path, (int) $width, $imageFormat);
+        $response = $this->serve($path, (int) $width, $imageFormat, allowAnimated: true);
         $response->setPublic();
         $response->setMaxAge($this->maxAge);
 
@@ -102,10 +102,10 @@ final class ImageVariantController
         return $query > 0 ? $query : $this->storage->defaultWidth();
     }
 
-    private function serve(string $path, int $width, ImageFormat $format): BinaryFileResponse
+    private function serve(string $path, int $width, ImageFormat $format, bool $allowAnimated = false): BinaryFileResponse
     {
         $source = $this->storage->resolveSource($path) ?? throw new NotFoundHttpException('Image not found.');
-        if (!$this->generator->supportsSource($source)) {
+        if (!$this->generator->supportsSource($source, $allowAnimated)) {
             throw new NotFoundHttpException('Unsupported image.');
         }
         if (!\in_array($format, $this->generator->availableFormats(), true)) {
