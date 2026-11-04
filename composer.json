@@ -1,5 +1,5 @@
 {
-    "name": "studioastra/image-optimizer-bundle",
+    "name": "romain-genin/symfony-image-optimizer-bundle",
     "description": "Symfony bundle that losslessly optimizes every uploaded image (weight, format, metadata) and serves device-adapted responsive variants (AVIF/WebP, srcset, Client Hints).",
     "type": "symfony-bundle",
     "keywords": [
