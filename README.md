@@ -1,6 +1,6 @@
 # ImageOptimizerBundle
 
-[![CI](https://github.com/StudioAstra/ImageOptimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/StudioAstra/ImageOptimizer/actions/workflows/ci.yml)
+[![CI](https://github.com/Romain-Genin/symfony_imageoptim/actions/workflows/ci.yml/badge.svg)](https://github.com/Romain-Genin/symfony_imageoptim/actions/workflows/ci.yml)
 [![Packagist Version](https://img.shields.io/packagist/v/romain-genin/symfony-image-optimizer-bundle)](https://packagist.org/packages/romain-genin/symfony-image-optimizer-bundle)
 [![PHP](https://img.shields.io/packagist/dependency-v/romain-genin/symfony-image-optimizer-bundle/php)](https://packagist.org/packages/romain-genin/symfony-image-optimizer-bundle)
 [![License](https://img.shields.io/packagist/l/romain-genin/symfony-image-optimizer-bundle)](LICENSE)
@@ -24,6 +24,9 @@ puis les **sert dans le format et la taille adaptés à chaque appareil** (AVIF/
 ```bash
 composer require romain-genin/symfony-image-optimizer-bundle
 ```
+
+> **Avec le starter** [`romain-genin/symfony-starter`](https://packagist.org/packages/romain-genin/symfony-starter) : `composer require`
+> suffit, les routes et la configuration sont déjà fournies. Le bundle reste utilisable seul dans n'importe quel projet Symfony.
 
 Avec Symfony Flex le bundle est enregistré automatiquement. Sinon, dans `config/bundles.php` :
 
